@@ -1,0 +1,16 @@
+/* Estilos básicos */
+body {
+    padding-top: 65px; /* Asegúrate de que el contenido no se oculte detrás de la barra de navegación */
+  }
+  
+  .navbar-custom {
+    background-color: #333; /* Color de fondo de la barra de navegación */
+  }
+  
+  .navbar-custom .navbar-brand,
+  .navbar-custom .navbar-nav .nav-link {
+    color: #fff; /* Color del texto de la barra de navegación */
+  }
+  
+  /* Estilos adicionales que necesites */
+  
