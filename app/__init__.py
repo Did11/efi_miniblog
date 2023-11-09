@@ -14,6 +14,10 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    print('Database URI:', app.config['SQLALCHEMY_DATABASE_URI'])
+    print('Secret Key:', app.config['SECRET_KEY'])
+    print('JWT Secret Key:', app.config['JWT_SECRET_KEY'])
+
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
