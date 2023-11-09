@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from models import User, db
+from .models import User, Post, Comment, db
 from app import bcrypt
-from app.models import Post, Comment
 
 auth_bp = Blueprint('auth_bp', __name__)
 blog_bp = Blueprint('blog_bp', __name__)

@@ -4,7 +4,6 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from config import Config
-from .routes import auth_bp, blog_bp
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -20,7 +19,13 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(blog_bp, url_prefix='/blog')
+    # Importaciones locales dentro de create_app para evitar importaciones circulares
+    with app.app_context():
+        from .routes import auth_bp, blog_bp
+        app.register_blueprint(auth_bp, url_prefix='/auth')
+        app.register_blueprint(blog_bp, url_prefix='/blog')
+
+        # Importa los modelos aquí si es necesario
+        from .models import User, Post, Comment
 
     return app
