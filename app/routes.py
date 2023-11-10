@@ -74,14 +74,14 @@ def login():
         password = request.form.get('password')
 
     if not username or not password:
-        return jsonify({"msg": "Missing username or password"}), 400
+        return jsonify({"msg": "Missing username or password falta loco"}), 400
 
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         access_token = create_access_token(identity=user.id)
         return jsonify(access_token=access_token), 200
     else:
-        return jsonify({"msg": "Bad username or password"}), 401
+        return jsonify({"msg": "Bad username or password todo mal eh"}), 401
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()

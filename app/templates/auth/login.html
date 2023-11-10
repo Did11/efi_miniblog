@@ -3,6 +3,11 @@
 {% block title %}Login | MiniBlog{% endblock %}
 
 {% block content %}
+
+  <div class="login-container">
+    <!-- Mensaje de error -->
+  <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+
   <!-- Formulario de inicio de sesión -->
   <div class="container">
     <div class="row">
@@ -23,4 +28,4 @@
     </div>
   </div>
 
-  {% endblock %}
+{% endblock %}
