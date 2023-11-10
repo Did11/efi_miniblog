@@ -67,15 +67,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // Función para manejar el cierre de sesión
   function logout() {
     fetch('/auth/logout', {
-      method: 'GET'
+        method: 'POST',
+        credentials: 'include'  // Importante para incluir cookies en la solicitud
     })
     .then(() => {
-      window.location.href = '/login';
+        window.location.href = '/login';
     })
     .catch(error => {
-      console.error('Error during logout:', error);
+        console.error('Error during logout:', error);
     });
-  }
+}
 
   // Agregar un manejador de eventos para el enlace de cierre de sesión
   const logoutLink = document.querySelector('#logout-link');
