@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const loginForm = document.querySelector('#login-form');
+  const registerForm = document.querySelector('#register-form');
   
   if (loginForm) {
       loginForm.addEventListener('submit', function(e) {
@@ -22,18 +23,17 @@ document.addEventListener('DOMContentLoaded', function() {
               return response.json();
           })
           .then(data => {
+              console.log('Login response data:', data); // Debugging line
               if (data.access_token) {
-                  // Guarda el token en localStorage o sessionStorage según prefieras
+                  console.log('Token received:', data.access_token); // Debugging line
                   localStorage.setItem('access_token', data.access_token);
-                  // Redirige al inicio después del login
                   window.location.href = '/';
               } else {
-                  // Manejar errores, mostrar mensajes al usuario
                   console.error('Login failed:', data.msg);
               }
           })
           .catch(error => {
-              console.error('Error:', error);
+              console.error('Error during login:', error);
           });
       });
   }
