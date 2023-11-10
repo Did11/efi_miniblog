@@ -75,6 +75,45 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
   
+  function updateUIForAuthState() {
+    const userIsAuthenticated = localStorage.getItem('access_token') !== null;
+
+    const loginLink = document.querySelector('#login-link');
+    const logoutLink = document.querySelector('#logout-link');
+    const userProfileLink = document.querySelector('#user-profile-link');
+
+    if (userIsAuthenticated) {
+        // Usuario autenticado
+        if (loginLink) loginLink.style.display = 'none';
+        if (logoutLink) logoutLink.style.display = 'block';
+        if (userProfileLink) userProfileLink.style.display = 'block';
+    } else {
+        // Usuario no autenticado
+        if (loginLink) loginLink.style.display = 'block';
+        if (logoutLink) logoutLink.style.display = 'none';
+        if (userProfileLink) userProfileLink.style.display = 'none';
+    }
+}
+
+// Actualizar la interfaz de usuario en la carga de la página
+updateUIForAuthState();
+
+// Función para manejar el cierre de sesión
+function logout() {
+    localStorage.removeItem('access_token');
+    updateUIForAuthState();
+    window.location.href = '/'; // Opcional: redirigir al inicio o a la página de inicio de sesión
+}
+
+// Agregar un manejador de eventos para el enlace de cierre de sesión
+const logoutLink = document.querySelector('#logout-link');
+if (logoutLink) {
+    logoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+    });
+}
+
     if (registerForm) {
       registerForm.addEventListener('submit', function(e) {
         e.preventDefault();

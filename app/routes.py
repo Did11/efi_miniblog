@@ -45,7 +45,7 @@ def register():
             return redirect(url_for('auth_bp.register'))
 
     user = User(username=username, email=email)
-    user.set_password(password)  # Asegúrate de que esta función exista en tu modelo de usuario
+    user.set_password(password)  
     db.session.add(user)
     db.session.commit()
 
@@ -61,7 +61,6 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html')
 
-    # Procesamiento de la solicitud de inicio de sesión
     username = request.form.get('username')
     password = request.form.get('password')
 
@@ -71,9 +70,29 @@ def login():
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         access_token = create_access_token(identity=user.id)
-        return jsonify(access_token=access_token), 200
+
+        # Crear respuesta y establecer la cookie HttpOnly
+        response = make_response(redirect(url_for('main_bp.index')))
+        response.set_cookie('access_token', access_token, httponly=True)
+        return response
     else:
         return jsonify({'error': 'Bad username or password'}), 401
+
+
+@auth_bp.route('/verify', methods=['GET'])
+@jwt_required(optional=True)
+def verify():
+    try:
+        get_jwt_identity()
+        return jsonify(isAuthenticated=True), 200
+    except:
+        return jsonify(isAuthenticated=False), 401
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    response = make_response(jsonify({"msg": "Logged out"}), 200)
+    response.delete_cookie('access_token')  #Usar el nombre correcto de tu cookie
+    return response
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()
