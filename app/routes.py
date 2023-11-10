@@ -56,8 +56,6 @@ def register():
         flash('User created successfully', 'success')
         return redirect(url_for('auth_bp.login'))
 
-
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -68,20 +66,14 @@ def login():
     password = request.form.get('password')
 
     if not username or not password:
-        flash('Missing username or password', 'error')
-        return redirect(url_for('auth_bp.login'))
+        return jsonify({'error': 'Missing username or password'}), 400
 
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         access_token = create_access_token(identity=user.id)
-
-        # Crear respuesta y establecer la cookie
-        response = make_response(redirect(url_for('main_bp.index')))
-        response.set_cookie('access_token', access_token, httponly=True)
-        return response
+        return jsonify(access_token=access_token), 200
     else:
-        flash('Bad username or password', 'error')
-        return redirect(url_for('auth_bp.login'))
+        return jsonify({'error': 'Bad username or password'}), 401
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()
