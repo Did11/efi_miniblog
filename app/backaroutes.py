@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash, make_response
+from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.extensions import db
 from .models import User, Post, Comment
@@ -63,25 +63,25 @@ def login():
     if request.method == 'GET':
         return render_template('auth/login.html')
 
-    # Procesamiento de la solicitud de inicio de sesión
-    username = request.form.get('username')
-    password = request.form.get('password')
+    if request.content_type == 'application/json':
+        # Procesa una solicitud JSON
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+    else:
+        # Procesa una solicitud de formulario HTML
+        username = request.form.get('username')
+        password = request.form.get('password')
 
     if not username or not password:
-        flash('Missing username or password', 'error')
-        return redirect(url_for('auth_bp.login'))
+        return jsonify({"msg": "Missing username or password falta loco"}), 400
 
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         access_token = create_access_token(identity=user.id)
-
-        # Crear respuesta y establecer la cookie
-        response = make_response(redirect(url_for('main_bp.index')))
-        response.set_cookie('access_token', access_token, httponly=True)
-        return response
+        return jsonify(access_token=access_token), 200
     else:
-        flash('Bad username or password', 'error')
-        return redirect(url_for('auth_bp.login'))
+        return jsonify({"msg": "Bad username or password todo mal eh"}), 401
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()
