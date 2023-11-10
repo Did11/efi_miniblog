@@ -46,25 +46,65 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>  
   <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
   <script>
-    // Este script verifica si el usuario está autenticado y actualiza la UI
-    document.addEventListener('DOMContentLoaded', function() {
-      updateNavigationLinks();
-    });
-
+    // Función para actualizar los enlaces de navegación basados en el estado de autenticación
     function updateNavigationLinks() {
-      // Aquí puedes agregar lógica para verificar si el usuario está autenticado
-      // Por ejemplo, puedes hacer una solicitud al servidor o verificar una cookie
-      const userIsAuthenticated = /* tu lógica para verificar la autenticación */;
-
-      document.getElementById('login-link').style.display = userIsAuthenticated ? 'none' : 'block';
-      document.getElementById('register-link').style.display = userIsAuthenticated ? 'none' : 'block';
-      document.getElementById('logout-link').style.display = userIsAuthenticated ? 'block' : 'none';
+      fetch('/auth/verify', {
+        method: 'GET',
+        credentials: 'include'  // Importante para incluir cookies en la solicitud
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Not authenticated');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Si el servidor responde que el usuario está autenticado
+        const userIsAuthenticated = data.isAuthenticated;
+  
+        document.getElementById('login-link').style.display = userIsAuthenticated ? 'none' : 'block';
+        document.getElementById('register-link').style.display = userIsAuthenticated ? 'none' : 'block';
+        document.getElementById('logout-link').style.display = userIsAuthenticated ? 'block' : 'none';
+      })
+      .catch(error => {
+        // Si el usuario no está autenticado o hay un error
+        document.getElementById('login-link').style.display = 'block';
+        document.getElementById('register-link').style.display = 'block';
+        document.getElementById('logout-link').style.display = 'none';
+      });
     }
-
+  
+    // Función para manejar el cierre de sesión
     function logout() {
-      // Aquí puedes agregar lógica para manejar el cierre de sesión
-      // Por ejemplo, eliminar la cookie y redirigir al usuario
+      fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include'  // Importante para incluir cookies en la solicitud
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Logout failed');
+        }
+        return response.json();
+      })
+      .then(() => {
+        // Actualizar la interfaz de usuario para reflejar el estado de no autenticado
+        updateNavigationLinks();
+        window.location.href = '/'; // Redirigir al inicio
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     }
+  
+    // Agregar un manejador de eventos para el enlace de cierre de sesión
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      logout();
+    });
+  
+    // Llamar a la función al cargar la página
+    updateNavigationLinks();
   </script>
+  
 </body>
 </html>
