@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db, bcrypt
+from app.extensions import db, bcrypt, jwt, migrate
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

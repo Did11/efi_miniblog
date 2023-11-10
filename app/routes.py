@@ -1,10 +1,15 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from .models import User, Post, Comment, db
-from app import bcrypt
+from app.extensions import db
+from .models import User, Post, Comment
 
 auth_bp = Blueprint('auth_bp', __name__)
 blog_bp = Blueprint('blog_bp', __name__)
+main_bp = Blueprint('main_bp', __name__)  # Blueprint para la ruta principal
+
+@main_bp.route('/')  # Ruta principal para mostrar index.html
+def index():
+    return render_template('index.html')
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -24,6 +29,7 @@ def register():
     db.session.commit()
 
     return jsonify({"msg": "User created"}), 201
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -78,8 +84,3 @@ def create_comment(post_id):
     db.session.commit()
 
     return jsonify({"id": comment.id, "content": comment.content, "user_id": comment.user_id, "post_id": comment.post_id}), 201
-
-
-
-# Asegúrate de registrar el Blueprint en tu app principal
-# app.register_blueprint(auth_bp)
