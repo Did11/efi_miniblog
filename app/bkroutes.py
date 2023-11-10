@@ -1,16 +1,3 @@
-from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from app.extensions import db
-from .models import User, Post, Comment
-
-auth_bp = Blueprint('auth_bp', __name__)
-blog_bp = Blueprint('blog_bp', __name__)
-main_bp = Blueprint('main_bp', __name__)  # Blueprint para la ruta principal
-
-@main_bp.route('/')  # Ruta principal para mostrar index.html
-def index():
-    return render_template('index.html')
-
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -55,23 +42,60 @@ def register():
     else:
         flash('User created successfully', 'success')
         return redirect(url_for('auth_bp.login'))
+    
+
+
+vacap de la que andba:
+
+from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from app.extensions import db
+from .models import User, Post, Comment
+
+auth_bp = Blueprint('auth_bp', __name__)
+blog_bp = Blueprint('blog_bp', __name__)
+main_bp = Blueprint('main_bp', __name__)  # Blueprint para la ruta principal
+
+@main_bp.route('/')  # Ruta principal para mostrar index.html
+def index():
+    return render_template('index.html')
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        # Si es una solicitud GET, simplemente muestra la página de registro
+        return render_template('auth/register.html')
+
+    # Si es una solicitud POST, procesa los datos del formulario
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    if not username or not email or not password:
+        # Aquí podrías querer redirigir de nuevo al formulario con un mensaje de error
+        flash('Missing username, email or password', 'error')
+        return redirect(url_for('auth_bp.register'))
+
+    if User.query.filter_by(username=username).first() is not None:
+        # Aquí también podrías querer manejar el error de manera diferente
+        flash('Username already taken', 'error')
+        return redirect(url_for('auth_bp.register'))
+
+    user = User(username=username, email=email)
+    user.set_password(password)  # Asegúrate de que esta función exista en tu modelo de usuario
+    db.session.add(user)
+    db.session.commit()
+
+    # Después de registrar, podrías querer redirigir al usuario a la página de inicio de sesión
+    flash('User created successfully', 'success')
+    return redirect(url_for('auth_bp.login'))
 
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'GET':
-        return render_template('auth/login.html')
-
-    if request.content_type == 'application/json':
-        # Procesa una solicitud JSON
-        data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-    else:
-        # Procesa una solicitud de formulario HTML
-        username = request.form.get('username')
-        password = request.form.get('password')
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
 
     if not username or not password:
         return jsonify({"msg": "Missing username or password"}), 400
